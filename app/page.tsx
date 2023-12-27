@@ -1,8 +1,5 @@
-import Image from 'next/image'
-import Form from '../components/Form'
+import ResultsTable from "@/components/ResultsTable";
 
 export default function Home() {
-  return (
-<Form/>
-  )
+  return <ResultsTable />;
 }
