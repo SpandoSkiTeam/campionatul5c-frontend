@@ -22,10 +22,10 @@ const renderStatusCell = (params) => (
 const processRows = (runs) => {
   const racerData = {};
 
-  runs.forEach((run) => {
+  runs.forEach((run, index) => {
     if (!racerData[run.racerId]) {
       racerData[run.racerId] = {
-        id: run.racerNumber,
+        id: index,
         racerNumber: run.racerNumber,
         racerName: run.racer.lastName.trim() + " " + run.racer.firstName.trim(),
         category: run.racer.category,
@@ -67,11 +67,11 @@ const ResultsTable = (props) => {
     },
     { field: "runTimeRun1", headerName: "Run Time 1", width: 150 },
     { field: "runTimeRun2", headerName: "Run Time 2", width: 150 },
-    // ... other columns if needed
   ];
 
   const rows: any = processRows(props.runs);
 
+  console.log(rows);
   return (
     <div
       style={{

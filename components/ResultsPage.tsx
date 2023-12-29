@@ -53,11 +53,11 @@ const ageGroups = [
   "Open Men",
 ];
 
-const baseUrl = "https://localhost:32770";
+const baseUrl = "https://api.campionatul5c.ro";
 const ResultsPage: React.FC = () => {
   const [value, setValue] = useState(0);
   const [races, setRaces] = useState([]);
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState("All");
 
   const handleAgeGroupChange = (event) => {
     setSelectedAgeGroup(event.target.value);
