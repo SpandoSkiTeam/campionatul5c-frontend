@@ -1,5 +1,5 @@
-import ResultsTable from "@/components/ResultsTable";
+import ResultsPage from "@/components/ResultsPage";
 
 export default function Home() {
-  return <ResultsTable />;
+  return <ResultsPage />;
 }
