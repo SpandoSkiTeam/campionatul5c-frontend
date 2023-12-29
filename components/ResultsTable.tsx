@@ -4,27 +4,31 @@ import { DataGrid } from "@mui/x-data-grid";
 const mapRunStatus = (status: number) => {
   switch (status) {
     case 0:
-      return "Registered";
+      return { text: "Înscris", color: "gray" };
     case 1:
-      return "InProgress";
+      return { text: "În coborâre", color: "blue" };
     case 2:
-      return "Finished";
+      return { text: "Finalizat", color: "green" };
     case 3:
-      return "Disqualified";
+      return { text: "Descalificat", color: "red" };
     default:
-      return "Unknown Status";
+      return { text: "Status Necunoscut", color: "black" };
   }
 };
+const renderStatusCell = (params) => (
+  <span style={{ color: params.value.color }}>{params.value.text}</span>
+);
 
-// Assuming each run object has a structure like the ones you provided
 const processRows = (runs) => {
   const racerData = {};
 
   runs.forEach((run) => {
-    if (!racerData[run.raceId]) {
-      racerData[run.raceId] = {
+    if (!racerData[run.racerId]) {
+      racerData[run.racerId] = {
         id: run.racerNumber,
         racerNumber: run.racerNumber,
+        racerName: run.racer.lastName.trim() + " " + run.racer.firstName.trim(),
+        category: run.racer.category,
         statusRun1: run.runNumber === 1 ? mapRunStatus(run.status) : "N/A",
         statusRun2: run.runNumber === 2 ? mapRunStatus(run.status) : "N/A",
         runTimeRun1: run.runNumber === 1 ? run.runTime : null,
@@ -32,11 +36,11 @@ const processRows = (runs) => {
       };
     } else {
       if (run.runNumber === 1) {
-        racerData[run.raceId].statusRun1 = mapRunStatus(run.status);
-        racerData[run.raceId].runTimeRun1 = run.runTime;
+        racerData[run.racerId].statusRun1 = mapRunStatus(run.status);
+        racerData[run.racerId].runTimeRun1 = run.runTime;
       } else if (run.runNumber === 2) {
-        racerData[run.raceId].statusRun2 = mapRunStatus(run.status);
-        racerData[run.raceId].runTimeRun2 = run.runTime;
+        racerData[run.racerId].statusRun2 = mapRunStatus(run.status);
+        racerData[run.racerId].runTimeRun2 = run.runTime;
       }
     }
   });
@@ -46,9 +50,21 @@ const processRows = (runs) => {
 
 const ResultsTable = (props) => {
   const columns = [
-    { field: "racerNumber", headerName: "Number", width: 80 },
-    { field: "statusRun1", headerName: "Status Run 1", width: 150 },
-    { field: "statusRun2", headerName: "Status Run 2", width: 150 },
+    { field: "racerNumber", headerName: "Numar", width: 100, minWidth: 80 },
+    { field: "racerName", headerName: "Nume", flex: 1, minWidth: 200 },
+    { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
+    {
+      field: "statusRun1",
+      headerName: "Status Run 1",
+      width: 150,
+      renderCell: renderStatusCell,
+    },
+    {
+      field: "statusRun2",
+      headerName: "Status Run 2",
+      width: 150,
+      renderCell: renderStatusCell,
+    },
     { field: "runTimeRun1", headerName: "Run Time 1", width: 150 },
     { field: "runTimeRun2", headerName: "Run Time 2", width: 150 },
     // ... other columns if needed
@@ -57,8 +73,19 @@ const ResultsTable = (props) => {
   const rows: any = processRows(props.runs);
 
   return (
-    <div style={{ height: 400, width: "100%", background: "white" }}>
-      <DataGrid rows={rows} columns={columns} />
+    <div
+      style={{
+        height: 600,
+        width: "100%",
+        background: "rgba(255, 255, 255, 0.8)",
+        borderRadius: "20px",
+      }}
+    >
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        sx={{ "& .MuiDataGrid-cell": { minWidth: 80 } }}
+      />
     </div>
   );
 };
