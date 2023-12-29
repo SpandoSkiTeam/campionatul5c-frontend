@@ -746,10 +746,10 @@ const testContent = [
     ],
   },
 ];
-const baseUrl = "http://api.campionatul5c.ro";
+const baseUrl = "https://api.campionatul5c.ro";
 const ResultsPage: React.FC = () => {
   const [value, setValue] = useState(0);
-  const [races, setRaces] = useState(testContent);
+  const [races, setRaces] = useState([]);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -780,7 +780,7 @@ const ResultsPage: React.FC = () => {
           ))}
         </Tabs>
       </Box>
-      {races.map((race, index) => (
+      {races.map((race: any, index) => (
         <TabPanel value={value} index={index} key={index}>
           <ResultsTable runs={race.runs} />
         </TabPanel>
