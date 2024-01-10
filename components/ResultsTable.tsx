@@ -1,23 +1,65 @@
-import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
+import { DataGrid, GridCellParams } from "@mui/x-data-grid";
+import { Icon } from "@mui/material";
+import axios from "axios";
 
 const mapRunStatus = (status: number) => {
   switch (status) {
     case 0:
-      return { text: "Înscris", color: "gray" };
+      return { text: "Înscris", color: "gray", iconName: "assignment" };
     case 1:
-      return { text: "În coborâre", color: "blue" };
+      return {
+        text: "În coborâre",
+        color: "orange",
+        iconName: "trending_down",
+      };
     case 2:
-      return { text: "Finalizat", color: "green" };
+      return { text: "Finalizat", color: "green", iconName: "check_circle" };
     case 3:
-      return { text: "Descalificat", color: "red" };
+      return { text: "Descalificat", color: "red", iconName: "cancel" };
+    case 4:
+      return { text: "Validat", color: "blue", iconName: "verified" };
     default:
-      return { text: "Status Necunoscut", color: "black" };
+      return { text: "Status Necunoscut", color: "black", iconName: "help" };
   }
 };
-const renderStatusCell = (params) => (
-  <span style={{ color: params.value.color }}>{params.value.text}</span>
-);
+
+const renderRun1Cell = (params: GridCellParams) => {
+  const row = params.row;
+  return (
+    <div
+      style={{
+        color: row.statusRun1.color,
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <Icon>{row.statusRun1.iconName}</Icon>
+      <span style={{ marginLeft: 8 }}>
+        {row.runTimeRun1 ? row.runTimeRun1 : row.statusRun1.text}
+      </span>
+    </div>
+  );
+};
+
+const renderRun2Cell = (params: GridCellParams) => {
+  // Similar implementation for Run 2
+  const row = params.row;
+  return (
+    <div
+      style={{
+        color: row.statusRun2.color,
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <Icon>{row.statusRun2.iconName}</Icon>
+      <span style={{ marginLeft: 8 }}>
+        {row.runTimeRun2 ? row.runTimeRun2 : row.statusRun2.text}
+      </span>
+    </div>
+  );
+};
 
 const processRows = (runs) => {
   const racerData = {};
@@ -26,6 +68,7 @@ const processRows = (runs) => {
     if (!racerData[run.racerId]) {
       racerData[run.racerId] = {
         id: index,
+        racerId: run.racerId,
         racerNumber: run.racerNumber,
         racerName: run.racer.lastName.trim() + " " + run.racer.firstName.trim(),
         category: run.racer.category,
@@ -49,35 +92,80 @@ const processRows = (runs) => {
 };
 
 const ResultsTable = (props) => {
+  const [selectedRacer, setSelectedRacer] = useState<any>(null);
+
+  const baseUrl = "https://api.campionatul5c.ro";
+  useEffect(() => {
+    const handleKeyPress = async (event) => {
+      if (selectedRacer) {
+        if (event.key === "v") {
+          await axios.get(
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${props.raceId}`
+          );
+          console.log("Pressed 'v' for racer:", selectedRacer);
+        } else if (event.key === "i") {
+          // Call the function for 'i'
+          await axios.get(
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${props.raceId}`
+          );
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [selectedRacer]);
+
+  const handleRowSelection = (selectionModel) => {
+    if (selectionModel.length > 0) {
+      const selectedId = selectionModel[0]; // Assuming single selection
+      const racer = rows.find((row) => row.id === selectedId);
+      setSelectedRacer(racer);
+    } else {
+      setSelectedRacer(null);
+    }
+  };
+
   const columns = [
-    { field: "racerNumber", headerName: "Numar", width: 100, minWidth: 80 },
-    { field: "racerName", headerName: "Nume", flex: 1, minWidth: 200 },
-    { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
+    {
+      field: "racerNumber",
+      headerName: "#",
+      width: 65,
+      minWidth: 65,
+    },
+    {
+      field: "racerName",
+      headerName: "Nume",
+      flex: 1,
+      minWidth: 200,
+      maxWidth: 300,
+    },
     {
       field: "statusRun1",
-      headerName: "Status Run 1",
+      headerName: "Run 1",
       width: 150,
-      renderCell: renderStatusCell,
+      renderCell: renderRun1Cell,
     },
     {
       field: "statusRun2",
-      headerName: "Status Run 2",
+      headerName: "Run 2",
       width: 150,
-      renderCell: renderStatusCell,
+      renderCell: renderRun2Cell,
     },
-    { field: "runTimeRun1", headerName: "Run Time 1", width: 150 },
-    { field: "runTimeRun2", headerName: "Run Time 2", width: 150 },
+    { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
   ];
 
   const rows: any = processRows(props.runs);
 
-  console.log(rows);
   return (
     <div
       style={{
         height: 600,
         width: "100%",
-        background: "rgba(255, 255, 255, 0.8)",
+        background: "rgba(255, 255, 255)",
         borderRadius: "20px",
       }}
     >
@@ -85,6 +173,8 @@ const ResultsTable = (props) => {
         rows={rows}
         columns={columns}
         sx={{ "& .MuiDataGrid-cell": { minWidth: 80 } }}
+        onRowSelectionModelChange={handleRowSelection}
+        rowSelectionModel={selectedRacer ? [selectedRacer.id] : []}
       />
     </div>
   );

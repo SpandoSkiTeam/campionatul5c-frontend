@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Clab-Black";
+  src: url("/fonts/Clab-Black.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   background-image: url("/images/backgroundimage.png");
   background-size: cover;
@@ -7,4 +14,22 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
+  font-family: "Clab-Black", sans-serif;
+}
+
+@media (hover: none) {
+  .button-hover-effect {
+    transform: scale(0.9);
+    margin: 4px;
+  }
+
+  .button-hover-effect:hover {
+    transform: none;
+    transition: none;
+  }
+}
+
+.button-hover-effect:hover {
+  transform: scale(1.1); /* Adjust the scale value as needed */
+  transition: transform 0.3s ease-in-out; /* Smooth transition for the scaling effect */
 }
