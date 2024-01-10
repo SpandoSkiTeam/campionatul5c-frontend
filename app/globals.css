@@ -33,3 +33,12 @@ body {
   transform: scale(1.1); /* Adjust the scale value as needed */
   transition: transform 0.3s ease-in-out; /* Smooth transition for the scaling effect */
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

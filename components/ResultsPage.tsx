@@ -11,7 +11,9 @@ import {
   Paper,
   Button,
   TextField,
+  IconButton,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
 
 const TabPanel = (props) => {
@@ -79,6 +81,7 @@ const ageGroups = [
 
 const baseUrl = "https://api.campionatul5c.ro";
 const ResultsPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
@@ -96,6 +99,13 @@ const ResultsPage: React.FC = () => {
 
   const handleSearchFilterChange = (event) => {
     setSearchFilter(event.target.value);
+  };
+
+  const handleLoadData = async (raceId) => {
+    setIsLoading(true);
+    await axios.post(baseUrl + "/Racer/LoadRacersForAllRaces");
+    //await axios.post(baseUrl + `/RaceManagement/GenerateRaceNumbers/${raceId}`);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -222,6 +232,15 @@ const ResultsPage: React.FC = () => {
             color: "gray", // Set the color to light gray
           }}
         >
+          <IconButton
+            onClick={handleLoadData}
+            sx={{
+              animation: isLoading ? "spin 1s linear infinite" : "none",
+              marginRight: "8px",
+            }}
+          >
+            <RefreshIcon />
+          </IconButton>
           Designed by{" "}
           <a
             href="https://www.linkedin.com/in/andrei-stetcu-44340588/"
