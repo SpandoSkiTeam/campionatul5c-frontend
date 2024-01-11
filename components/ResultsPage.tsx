@@ -82,6 +82,7 @@ const ageGroups = [
 const baseUrl = "https://api.campionatul5c.ro";
 const ResultsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingData, setIsFetchingData] = useState(false);
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
@@ -108,22 +109,22 @@ const ResultsPage: React.FC = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(baseUrl + "/Race");
-        setRaces(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Handle the error as needed
-      }
-    };
+  const fetchData = async () => {
+    setIsFetchingData(true);
+    try {
+      const response = await axios.get(baseUrl + "/Race");
+      setRaces(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle the error as needed
+    } finally {
+      setIsFetchingData(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData(); // Initial fetch
 
-    const interval = setInterval(() => {
-      fetchData(); // Fetch every 5 seconds
-    }, 5000);
     const query = new URLSearchParams(window.location.search);
     const initialTab = parseInt(query.get("tab") || "", 10);
     setSetSelectedRace(isNaN(initialTab) ? 0 : initialTab);
@@ -133,7 +134,6 @@ const ResultsPage: React.FC = () => {
       if (!isNaN(tab)) {
         setSetSelectedRace(tab);
       }
-      return () => clearInterval(interval);
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -145,6 +145,33 @@ const ResultsPage: React.FC = () => {
 
   return (
     <Box sx={{ width: "100%", color: "white" }}>
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 20,
+          right: 20,
+          zIndex: 1000,
+          background: "white",
+          borderColor: "#14204f",
+          borderWidth: "1px",
+          borderRadius: "8px",
+          borderStyle: "solid",
+        }}
+      >
+        <IconButton
+          onClick={fetchData}
+          sx={{
+            animation: isFetchingData ? "spin 1s linear infinite" : "none",
+          }}
+        >
+          <RefreshIcon
+            style={{
+              borderColor: "#14204f",
+              color: "#14204f",
+            }}
+          />
+        </IconButton>
+      </Box>
       <Paper
         sx={{
           backgroundColor: "rgba(255,255,255)",
