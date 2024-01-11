@@ -148,8 +148,8 @@ const ResultsPage: React.FC = () => {
       <Box
         sx={{
           position: "fixed",
-          bottom: 20,
-          right: 20,
+          bottom: 14,
+          right: 14,
           zIndex: 1000,
           background: "white",
           borderColor: "#14204f",

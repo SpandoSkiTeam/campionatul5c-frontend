@@ -74,16 +74,26 @@ const processRows = (runs) => {
         category: run.racer.category,
         statusRun1: run.runNumber === 1 ? mapRunStatus(run.status) : "N/A",
         statusRun2: run.runNumber === 2 ? mapRunStatus(run.status) : "N/A",
-        runTimeRun1: run.runNumber === 1 ? run.runTime : null,
-        runTimeRun2: run.runNumber === 2 ? run.runTime : null,
+        runTimeRun1:
+          run.runNumber === 1 && run.runTime
+            ? run.runTime.substring(3, run.runTime.length - 4)
+            : null,
+        runTimeRun2:
+          run.runNumber === 2 && run.runTime
+            ? run.runTime.substring(3, run.runTime.length - 4)
+            : null,
       };
     } else {
       if (run.runNumber === 1) {
         racerData[run.racerId].statusRun1 = mapRunStatus(run.status);
-        racerData[run.racerId].runTimeRun1 = run.runTime;
+        racerData[run.racerId].runTimeRun1 = run.runTime
+          ? run.runTime.substring(3, run.runTime.length - 4)
+          : null;
       } else if (run.runNumber === 2) {
         racerData[run.racerId].statusRun2 = mapRunStatus(run.status);
-        racerData[run.racerId].runTimeRun2 = run.runTime;
+        racerData[run.racerId].runTimeRun2 = run.runTime
+          ? run.runTime.substring(3, run.runTime.length - 4)
+          : null;
       }
     }
   });
