@@ -245,7 +245,10 @@ const ResultsPage: React.FC = () => {
                   (r.racer.lastName + " " + r.racer.firstName)
                     .toLowerCase()
                     .includes(searchFilter.toLowerCase())
-                )}
+                )
+                .sort((a, b) => {
+                  return a.racerNumber - b.racerNumber;
+                })}
               raceId={race.id}
             />
           </TabPanel>
