@@ -19,6 +19,8 @@ const mapRunStatus = (status: number) => {
       return { text: "Descalificat", color: "red", iconName: "cancel" };
     case 4:
       return { text: "Validat", color: "blue", iconName: "verified" };
+    case 5:
+      return { text: "Neîncheiat", color: "purple", iconName: "pause" };
     default:
       return { text: "Status Necunoscut", color: "black", iconName: "help" };
   }
