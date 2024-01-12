@@ -84,6 +84,22 @@ const renderTotalTimeCell = (params: GridCellParams) => {
   );
 };
 
+const renderParentalAgreementCell = (params: GridCellParams) => {
+  // Similar implementation for Run 2
+  const row = params.row;
+  return (
+    <div
+      style={{
+        color: "green",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      {row.racerParentalAgreement && <Icon>{"check_circle"}</Icon>}
+    </div>
+  );
+};
+
 const getTotalTime = (time1, time2) => {
   // Convert time strings to milliseconds
   const toMilliseconds = (time) => {
@@ -116,6 +132,7 @@ const processRows = (runs) => {
         racerId: run.racerId,
         racerNumber: run.racerNumber,
         racerName: run.racer.lastName.trim() + " " + run.racer.firstName.trim(),
+        racerParentalAgreement: run.racer.parentalAgreementSigned,
         category: run.racer.category,
         statusRun1: run.runNumber === 1 ? mapRunStatus(run.status) : "N/A",
         statusRun2: run.runNumber === 2 ? mapRunStatus(run.status) : "N/A",
@@ -227,6 +244,13 @@ const ResultsTable = (props) => {
       renderCell: renderTotalTimeCell,
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
+    {
+      filed: "racerParentalAgreement",
+      headerName: "AP",
+      width: 60,
+      minWidth: 60,
+      renderCell: renderParentalAgreementCell,
+    },
   ];
 
   const rows: any = processRows(props.runs);

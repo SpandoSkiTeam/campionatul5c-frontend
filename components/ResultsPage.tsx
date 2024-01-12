@@ -13,6 +13,8 @@ import {
   TextField,
   IconButton,
 } from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
+
 import RefreshIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
 
@@ -237,10 +239,17 @@ const ResultsPage: React.FC = () => {
             <Box
               sx={{
                 fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
+                display: "flex",
+                flexDirection: "row",
                 color: "#7eb7e3",
               }}
             >
-              Rezultatele afișate în timpul cursei sunt neoficiale.
+              <WarningIcon
+                sx={{ fontSize: { xs: "1.2rem", sm: "1.3rem", md: "1.3rem" } }}
+              />
+              <Box style={{ marginBottom: "3px" }}>
+                Rezultatele afișate în timpul cursei sunt neoficiale.
+              </Box>
             </Box>
             <ResultsTable
               runs={race.runs
