@@ -67,7 +67,7 @@ const renderRun2Cell = (params: GridCellParams) => {
   );
 };
 
-const renderBestTimeCell = (params: GridCellParams) => {
+const renderTotalTimeCell = (params: GridCellParams) => {
   // Similar implementation for Run 2
   const row = params.row;
   return (
@@ -78,27 +78,31 @@ const renderBestTimeCell = (params: GridCellParams) => {
         alignItems: "center",
       }}
     >
-      {row.bestTime && <Icon>{"check_circle"}</Icon>}
-      <span style={{ marginLeft: 8 }}>{row.bestTime || ""}</span>
+      {row.totalTime && <Icon>{"check_circle"}</Icon>}
+      <span style={{ marginLeft: 8 }}>{row.totalTime || ""}</span>
     </div>
   );
 };
 
-const compareTimes = (time1, time2) => {
-  // Convert time strings to milliseconds for comparison
+const getTotalTime = (time1, time2) => {
+  // Convert time strings to milliseconds
   const toMilliseconds = (time) => {
-    if (!time || time.trim() === "") return null;
+    if (!time || time.trim() === "") return 0;
     const [minutes, seconds] = time.split(":").map(Number);
-    const [sec, milli] = seconds.toString().split(".").map(Number);
+    const [sec, milli = 0] = seconds.toString().split(".").map(Number);
     return (minutes * 60 + sec) * 1000 + milli;
   };
 
-  const time1Ms = toMilliseconds(time1);
-  const time2Ms = toMilliseconds(time2);
+  // Add the times in milliseconds
+  const totalMilliseconds = toMilliseconds(time1) + toMilliseconds(time2);
 
-  if (time1Ms === null) return time2;
-  if (time2Ms === null) return time1;
-  return time1Ms < time2Ms ? time1 : time2;
+  // Convert total milliseconds back to the time format
+  const totalSeconds = Math.floor(totalMilliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const milliseconds = totalMilliseconds % 1000;
+
+  return `${minutes}:${seconds}.${milliseconds.toString().padStart(3, "0")}`;
 };
 
 const processRows = (runs) => {
@@ -123,7 +127,7 @@ const processRows = (runs) => {
           run.runNumber === 2 && run.runTime
             ? run.runTime.substring(3, run.runTime.length - 4)
             : null,
-        bestTime: null,
+        totalTime: null,
       };
     } else {
       if (run.runNumber === 1) {
@@ -137,10 +141,15 @@ const processRows = (runs) => {
           ? run.runTime.substring(3, run.runTime.length - 4)
           : null;
       }
-      racerData[run.racerId].bestTime = compareTimes(
-        racerData[run.racerId].runTimeRun1,
-        racerData[run.racerId].runTimeRun2
-      );
+      if (
+        racerData[run.racerId].statusRun1.text === "Finalizat" &&
+        racerData[run.racerId].statusRun2.text === "Finalizat"
+      ) {
+        racerData[run.racerId].totalTime = getTotalTime(
+          racerData[run.racerId].runTimeRun1,
+          racerData[run.racerId].runTimeRun2
+        );
+      }
     }
   });
 
@@ -212,10 +221,10 @@ const ResultsTable = (props) => {
       renderCell: renderRun2Cell,
     },
     {
-      field: "bestTime",
-      headerName: "Best Time",
+      field: "totalTime",
+      headerName: "Total Time",
       width: 150,
-      renderCell: renderBestTimeCell,
+      renderCell: renderTotalTimeCell,
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
   ];
