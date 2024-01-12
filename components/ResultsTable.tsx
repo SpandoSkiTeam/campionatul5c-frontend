@@ -4,7 +4,6 @@ import { Icon } from "@mui/material";
 import axios from "axios";
 
 const mapRunStatus = (status: number) => {
-  console.log(status);
   switch (status) {
     case 0:
       return { text: "Înscris", color: "gray", iconName: "assignment" };
