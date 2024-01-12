@@ -38,7 +38,9 @@ const renderRun1Cell = (params: GridCellParams) => {
     >
       <Icon>{row.statusRun1.iconName}</Icon>
       <span style={{ marginLeft: 8 }}>
-        {row.runTimeRun1 ? row.runTimeRun1 : row.statusRun1.text}
+        {row.runTimeRun1 && row.statusRun1 === "Finalizat"
+          ? row.runTimeRun1
+          : row.statusRun1.text}
       </span>
     </div>
   );
@@ -57,7 +59,9 @@ const renderRun2Cell = (params: GridCellParams) => {
     >
       <Icon>{row.statusRun2.iconName}</Icon>
       <span style={{ marginLeft: 8 }}>
-        {row.runTimeRun2 ? row.runTimeRun2 : row.statusRun2.text}
+        {row.runTimeRun2 && row.statusRun2 === "Finalizat"
+          ? row.runTimeRun2
+          : row.statusRun2.text}
       </span>
     </div>
   );

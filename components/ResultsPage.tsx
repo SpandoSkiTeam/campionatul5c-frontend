@@ -234,6 +234,14 @@ const ResultsPage: React.FC = () => {
                 onChange={handleSearchFilterChange}
               />
             </Box>
+            <Box
+              sx={{
+                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
+                color: "#7eb7e3",
+              }}
+            >
+              Rezultatele afișate în timpul cursei sunt neoficiale.
+            </Box>
             <ResultsTable
               runs={race.runs
                 .filter((r) =>
