@@ -78,7 +78,7 @@ const renderTotalTimeCell = (params: GridCellParams) => {
         alignItems: "center",
       }}
     >
-      {row.totalTime && <Icon>{"check_circle"}</Icon>}
+      {row.totalTime && row.totalTime != "N/A" && <Icon>{"check_circle"}</Icon>}
       <span style={{ marginLeft: 8 }}>{row.totalTime || ""}</span>
     </div>
   );
