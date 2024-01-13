@@ -105,20 +105,19 @@ const getTotalTime = (time1, time2) => {
   const toMilliseconds = (time) => {
     if (!time || time.trim() === "") return 0;
     const [minutes, seconds] = time.split(":").map(Number);
-    const [sec, milli = 0] = seconds.toString().split(".").map(Number);
+    const [secs, millis = 0] = seconds.toString().split(".");
+    const sec = Number(secs);
+    const milli = Number(millis.padEnd(3, "0"));
     return (minutes * 60 + sec) * 1000 + milli;
   };
 
   // Add the times in milliseconds
   const totalMilliseconds = toMilliseconds(time1) + toMilliseconds(time2);
-
   // Convert total milliseconds back to the time format
   const totalSeconds = Math.floor(totalMilliseconds / 1000);
   const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
   const milliseconds = totalMilliseconds % 1000;
-
-  // return `${minutes}:${seconds}.${milliseconds.toString().padStart(3, "0")}`;
+  const seconds = totalSeconds % 60;
   return `${minutes.toString().padStart(2, "0")}:${seconds
     .toString()
     .padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
@@ -128,7 +127,6 @@ const processRows = (runs) => {
   const racerData = {};
 
   runs.forEach((run, index) => {
-    console.log(run.runTime);
     if (!racerData[run.racerId]) {
       racerData[run.racerId] = {
         id: index,
@@ -165,10 +163,11 @@ const processRows = (runs) => {
         racerData[run.racerId].statusRun1.text === "Finalizat" &&
         racerData[run.racerId].statusRun2.text === "Finalizat"
       ) {
-        racerData[run.racerId].totalTime = getTotalTime(
-          racerData[run.racerId].runTimeRun1,
-          racerData[run.racerId].runTimeRun2
-        );
+        if (racerData)
+          racerData[run.racerId].totalTime = getTotalTime(
+            racerData[run.racerId].runTimeRun1,
+            racerData[run.racerId].runTimeRun2
+          );
       } else {
         racerData[run.racerId].totalTime = "N/A";
       }

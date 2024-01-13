@@ -247,9 +247,9 @@ const ResultsPage: React.FC = () => {
               <WarningIcon
                 sx={{ fontSize: { xs: "1.2rem", sm: "1.3rem", md: "1.3rem" } }}
               />
-              <Box style={{ marginBottom: "3px" }}>
+              {/* <Box style={{ marginBottom: "3px" }}>
                 Rezultatele afișate în timpul cursei sunt neoficiale.
-              </Box>
+              </Box> */}
             </Box>
             <ResultsTable
               runs={race.runs
