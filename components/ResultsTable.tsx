@@ -245,10 +245,9 @@ const ResultsTable = (props) => {
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
     {
-      filed: "racerParentalAgreement",
+      field: "racerParentalAgreement",
       headerName: "AP",
       width: 60,
-      minWidth: 60,
       renderCell: renderParentalAgreementCell,
     },
   ];
