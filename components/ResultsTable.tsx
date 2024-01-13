@@ -169,6 +169,8 @@ const processRows = (runs) => {
           racerData[run.racerId].runTimeRun1,
           racerData[run.racerId].runTimeRun2
         );
+      } else {
+        racerData[run.racerId].totalTime = "N/A";
       }
     }
   });
