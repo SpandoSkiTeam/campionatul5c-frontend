@@ -88,7 +88,8 @@ const ResultsPage: React.FC = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
-  const [selectedRace, setSetSelectedRace] = useState(1);
+  const currentRace = 1;
+  const [selectedRace, setSetSelectedRace] = useState(currentRace);
 
   const handleAgeGroupChange = (event) => {
     setSelectedAgeGroup(event.target.value);
@@ -129,7 +130,7 @@ const ResultsPage: React.FC = () => {
 
     const query = new URLSearchParams(window.location.search);
     const initialTab = parseInt(query.get("tab") || "", 10);
-    setSetSelectedRace(isNaN(initialTab) ? 0 : initialTab);
+    setSetSelectedRace(isNaN(initialTab) ? currentRace : initialTab);
     const handlePopState = (event) => {
       const query = new URLSearchParams(window.location.search);
       const tab = parseInt(query.get("tab") || "", 10);
