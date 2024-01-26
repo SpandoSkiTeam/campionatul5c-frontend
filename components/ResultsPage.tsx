@@ -236,7 +236,7 @@ const ResultsPage: React.FC = () => {
                 onChange={handleSearchFilterChange}
               />
             </Box>
-            {/* <Box
+            <Box
               sx={{
                 fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
                 display: "flex",
@@ -250,7 +250,7 @@ const ResultsPage: React.FC = () => {
               <Box style={{ marginBottom: "3px" }}>
                 Rezultatele afișate în timpul cursei sunt neoficiale.
               </Box>
-            </Box> */}
+            </Box>
             <ResultsTable
               runs={race.runs
                 .filter((r) =>
