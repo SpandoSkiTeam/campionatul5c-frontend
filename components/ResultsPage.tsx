@@ -88,7 +88,7 @@ const ResultsPage: React.FC = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
-  const [selectedRace, setSetSelectedRace] = useState(0);
+  const [selectedRace, setSetSelectedRace] = useState(1);
 
   const handleAgeGroupChange = (event) => {
     setSelectedAgeGroup(event.target.value);
