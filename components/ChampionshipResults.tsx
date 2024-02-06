@@ -40,10 +40,10 @@ const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
   }, [selectedAgeGroup, searchFilter]);
 
   const columns = [
-    { field: "rankInCategory", headerName: "Locul", width: 100 },
+    { field: "rankInCategory", headerName: "#", width: 100 },
     { field: "racerName", headerName: "Nume", width: 200 },
-    { field: "category", headerName: "Categorie", width: 150 },
     { field: "points", headerName: "Total Puncte", width: 130 },
+    { field: "category", headerName: "Categorie", width: 150 },
   ];
 
   return (
