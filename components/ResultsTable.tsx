@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { DataGrid, GridCellParams } from "@mui/x-data-grid";
 import { Icon } from "@mui/material";
 import axios from "axios";
+import { calculatePoints } from "@/app/utils/utils";
 
 const mapRunStatus = (status: number) => {
   switch (status) {
@@ -100,6 +101,30 @@ const renderParentalAgreementCell = (params: GridCellParams) => {
   );
 };
 
+const runTimeComparator = (v1, v2, cellParams1, cellParams2) => {
+  const time1 = cellParams1?.value;
+  const time2 = cellParams2?.value;
+
+  // If both times are present, compare them
+  if (time1 && time2) {
+    return timeStringToMilliseconds(time1) - timeStringToMilliseconds(time2);
+  }
+
+  // Handle cases where one or both times are missing
+  if (!time1) return 1; // Sort nulls to the end
+  if (!time2) return -1; // Sort nulls to the end
+  return 0;
+};
+
+const timeStringToMilliseconds = (timeString) => {
+  if (!timeString || timeString === "N/A") return Infinity; // To handle non-finishers
+  const [minutes, rest] = timeString.split(":");
+  const [seconds, millis = "0"] = rest.split(".");
+  return (
+    parseInt(minutes) * 60000 + parseInt(seconds) * 1000 + parseInt(millis)
+  );
+};
+
 const getTotalTime = (time1, time2) => {
   // Convert time strings to milliseconds
   const toMilliseconds = (time) => {
@@ -110,7 +135,6 @@ const getTotalTime = (time1, time2) => {
     const milli = Number(millis.padEnd(3, "0"));
     return (minutes * 60 + sec) * 1000 + milli;
   };
-
   // Add the times in milliseconds
   const totalMilliseconds = toMilliseconds(time1) + toMilliseconds(time2);
   // Convert total milliseconds back to the time format
@@ -174,11 +198,54 @@ const processRows = (runs) => {
     }
   });
 
+  const categories: any = Object.values(racerData).reduce(
+    (acc: any, racer: any) => {
+      const category = racer.category;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      if (
+        racer.statusRun1.text === "Finalizat" &&
+        racer.statusRun2.text === "Finalizat"
+      )
+        acc[category].push(racer);
+      return acc;
+    },
+    {}
+  );
+
+  Object.keys(categories).forEach((category) => {
+    // Sort racers by total time within each category
+    categories[category].sort((a, b) => {
+      return (
+        timeStringToMilliseconds(a.totalTime) -
+        timeStringToMilliseconds(b.totalTime)
+      ); // Assuming totalTime is a number, adjust if it's a different format
+    });
+
+    // Assign points based on position
+    categories[category].forEach((racer, index) => {
+      racer.accumulatedPoints = calculatePoints(index + 1);
+    });
+  });
   return Object.values(racerData);
 };
 
 const ResultsTable = (props) => {
   const [selectedRacer, setSelectedRacer] = useState<any>(null);
+  const [sortModel, setSortModel] = useState<any>([
+    { field: "totalTime", sort: "asc" },
+  ]);
+
+  const handleSortModelChange = (model) => {
+    if (model.length > 1) {
+      // Keep only the last sorted column
+      const lastSorted = model[model.length - 1];
+      setSortModel([lastSorted]);
+    } else {
+      setSortModel(model);
+    }
+  };
 
   const baseUrl = "https://api.campionatul5c.ro";
   useEffect(() => {
@@ -230,16 +297,20 @@ const ResultsTable = (props) => {
       maxWidth: 300,
     },
     {
-      field: "statusRun1",
+      field: "runTimeRun1",
       headerName: "Run 1",
       width: 150,
       renderCell: renderRun1Cell,
+      sortable: true,
+      sortComparator: runTimeComparator,
     },
     {
-      field: "statusRun2",
+      field: "runTimeRun2",
       headerName: "Run 2",
       width: 150,
       renderCell: renderRun2Cell,
+      sortable: true,
+      sortComparator: runTimeComparator,
     },
     {
       field: "totalTime",
@@ -248,6 +319,12 @@ const ResultsTable = (props) => {
       renderCell: renderTotalTimeCell,
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
+    {
+      field: "accumulatedPoints",
+      headerName: "Puncte",
+      width: 150,
+      valueGetter: (params) => params.row.accumulatedPoints || 0,
+    },
     {
       field: "racerParentalAgreement",
       headerName: "AP",
@@ -273,6 +350,8 @@ const ResultsTable = (props) => {
         sx={{ "& .MuiDataGrid-cell": { minWidth: 80 } }}
         onRowSelectionModelChange={handleRowSelection}
         rowSelectionModel={selectedRacer ? [selectedRacer.id] : []}
+        sortModel={sortModel}
+        onSortModelChange={handleSortModelChange}
       />
     </div>
   );
