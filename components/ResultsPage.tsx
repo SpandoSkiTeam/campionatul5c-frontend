@@ -17,6 +17,8 @@ import WarningIcon from "@mui/icons-material/Warning";
 
 import RefreshIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
+import ChampionshipResults from "./ChampionshipResults";
+import { ageGroups, baseUrl } from "@/app/utils/constants";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -63,25 +65,6 @@ const ImageMenu = ({ races, onRaceSelect, selectedRace }) => {
   );
 };
 
-const ageGroups = [
-  "Toate",
-  "Girls 6 and Under",
-  "Boys 6 and Under",
-  "Girls 7-8",
-  "Boys 7-8",
-  "Girls 9-10",
-  "Boys 9-10",
-  "Girls 11-12",
-  "Boys 11-12",
-  "Girls 13-14",
-  "Boys 13-14",
-  "Girls 15-16",
-  "Boys 15-16",
-  "Open Women",
-  "Open Men",
-];
-
-const baseUrl = "https://api.campionatul5c.ro";
 const ResultsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -90,7 +73,8 @@ const ResultsPage: React.FC = () => {
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
   const currentRace = 2;
   const [selectedRace, setSetSelectedRace] = useState(currentRace);
-
+  const [displayChampionshipResults, setDisplayChampionshipResults] =
+    useState(false);
   const handleAgeGroupChange = (event) => {
     setSelectedAgeGroup(event.target.value);
   };
@@ -116,6 +100,7 @@ const ResultsPage: React.FC = () => {
     setIsFetchingData(true);
     try {
       const response = await axios.get(baseUrl + "/Race");
+      console.log(response.data);
       setRaces(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -175,6 +160,7 @@ const ResultsPage: React.FC = () => {
           />
         </IconButton>
       </Box>
+
       <Paper
         sx={{
           backgroundColor: "rgba(255,255,255)",
@@ -197,80 +183,107 @@ const ResultsPage: React.FC = () => {
         >
           Campionatul 5C
         </Box>
-        <ImageMenu
-          races={races}
-          onRaceSelect={handleRaceSelect}
-          selectedRace={selectedRace}
-        />
-        {races.map((race: any, index) => (
-          <TabPanel value={selectedRace} index={index} key={index}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "center",
-                gap: 2, // Adjust the gap as needed
-                mb: 2,
-                width: "100%",
-              }}
-            >
-              <FormControl sx={{ width: "100%", maxWidth: "400px" }}>
-                <InputLabel>Categoria</InputLabel>
-                <Select
-                  value={selectedAgeGroup}
-                  label="Categoria"
-                  onChange={handleAgeGroupChange}
-                >
-                  {ageGroups.map((ageGroup, index) => (
-                    <MenuItem key={index} value={ageGroup}>
-                      {ageGroup}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+        {!displayChampionshipResults && (
+          <ImageMenu
+            races={races}
+            onRaceSelect={handleRaceSelect}
+            selectedRace={selectedRace}
+          />
+        )}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Button
+            onClick={() => setDisplayChampionshipResults((prev) => !prev)}
+          >
+            {displayChampionshipResults
+              ? "Rezultate curse"
+              : "Rezultate campionat"}
+          </Button>
+        </Box>
 
-              <TextField
-                sx={{ width: "100%", maxWidth: "400px" }}
-                label="Caută după nume"
-                variant="outlined"
-                value={searchFilter}
-                onChange={handleSearchFilterChange}
-              />
-            </Box>
-            <Box
-              sx={{
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
-                display: "flex",
-                flexDirection: "row",
-                color: "#7eb7e3",
-              }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "center",
+            gap: 2, // Adjust the gap as needed
+            mb: 2,
+            width: "95%",
+            margin: "auto",
+          }}
+        >
+          <FormControl sx={{ width: "100%", maxWidth: "400px" }}>
+            <InputLabel>Categoria</InputLabel>
+            <Select
+              value={selectedAgeGroup}
+              label="Categoria"
+              onChange={handleAgeGroupChange}
             >
-              <WarningIcon
-                sx={{ fontSize: { xs: "1.2rem", sm: "1.3rem", md: "1.3rem" } }}
-              />
-              <Box style={{ marginBottom: "3px", fontFamily: "arial" }}>
-                Rezultatele afișate în timpul cursei sunt neoficiale.
-              </Box>
-            </Box>
-            <ResultsTable
-              runs={race.runs
-                .filter((r) =>
-                  selectedAgeGroup !== "" && selectedAgeGroup !== "Toate"
-                    ? r.racer.category === selectedAgeGroup
-                    : true
-                )
-                .filter((r) =>
-                  (r.racer.lastName + " " + r.racer.firstName)
-                    .toLowerCase()
-                    .includes(searchFilter.toLowerCase())
-                )
-                .sort((a, b) => {
-                  return a.racerNumber - b.racerNumber;
-                })}
-              raceId={race.id}
+              {ageGroups.map((ageGroup, index) => (
+                <MenuItem key={index} value={ageGroup}>
+                  {ageGroup}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            sx={{ width: "100%", maxWidth: "400px" }}
+            label="Caută după nume"
+            variant="outlined"
+            value={searchFilter}
+            onChange={handleSearchFilterChange}
+          />
+        </Box>
+
+        <Box>
+          {displayChampionshipResults ? (
+            <ChampionshipResults
+              selectedAgeGroup={selectedAgeGroup}
+              searchFilter={searchFilter.toLowerCase()}
             />
-          </TabPanel>
-        ))}
+          ) : (
+            <Box>
+              {races.map((race: any, index) => (
+                <TabPanel value={selectedRace} index={index} key={index}>
+                  <Box
+                    sx={{
+                      fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
+                      display: "flex",
+                      flexDirection: "row",
+                      color: "#7eb7e3",
+                    }}
+                  >
+                    <WarningIcon
+                      sx={{
+                        fontSize: { xs: "1.2rem", sm: "1.3rem", md: "1.3rem" },
+                      }}
+                    />
+                    <Box
+                      style={{
+                        marginBottom: "3px",
+                        fontFamily: "arial",
+                      }}
+                    >
+                      Rezultatele afișate în timpul cursei sunt neoficiale.
+                    </Box>
+                  </Box>
+                  <ResultsTable
+                    runs={race.runs}
+                    raceId={race.id}
+                    selectedAgeGroup={selectedAgeGroup}
+                    searchFilter={searchFilter}
+                  />
+                </TabPanel>
+              ))}
+            </Box>
+          )}
+        </Box>
+
         <Box
           sx={{
             textAlign: "center",

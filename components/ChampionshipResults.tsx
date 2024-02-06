@@ -1,66 +1,68 @@
 import React, { useState, useEffect } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+import { baseUrl } from "@/app/utils/constants";
 
-const ChampionshipResults = ({ races }) => {
-  const [championshipResults, setChampionshipResults] = useState([]);
+const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
+  const [displayResults, setDisplayResults] = useState<readonly any[]>([]);
 
   useEffect(() => {
-    const calculatePoints = (position) => {
-      switch (position) {
-        case 1:
-          return 100;
-        case 2:
-          return 80;
-        case 3:
-          return 60;
-        case 4:
-          return 40;
-        case 5:
-          return 20;
-        default:
-          return 10;
+    const fetchResults = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/Race/GetChampionshipResults`
+        );
+        const results = response.data;
+
+        const filteredResults = results
+          .filter((racer: any) => racer.points > 0)
+          .filter(
+            (racer: any) =>
+              selectedAgeGroup === "" ||
+              selectedAgeGroup === "Toate" ||
+              racer.category === selectedAgeGroup
+          )
+          .filter(
+            (racer: any) =>
+              searchFilter === "" ||
+              racer.racerName.toLowerCase().includes(searchFilter)
+          )
+          .sort((a: any, b: any) => b.points - a.points);
+
+        setDisplayResults(filteredResults);
+      } catch (error) {
+        console.error("Error fetching championship results", error);
+        // Handle the error appropriately
       }
     };
 
-    const aggregatePoints = () => {
-      let pointsMap = {};
+    fetchResults();
+  }, [selectedAgeGroup, searchFilter]);
 
-      // Assuming races is an array of race results, each containing racerId and their position
-      races.forEach((race, index) => {
-        if (index < 3) {
-          // Only consider first three races
-          race.forEach(({ racerId, position }) => {
-            if (!pointsMap[racerId]) {
-              pointsMap[racerId] = {
-                racerId,
-                points: 0,
-                racesParticipated: 0,
-              };
-            }
-            pointsMap[racerId].points += calculatePoints(position);
-            pointsMap[racerId].racesParticipated++;
-          });
-        }
-      });
-
-      // Filter out racers who didn't participate in all first three races and sort by points
-      return Object.values(pointsMap)
-        .filter((racer) => racer.racesParticipated === 3)
-        .sort((a, b) => b.points - a.points);
-    };
-
-    setChampionshipResults(aggregatePoints());
-  }, [races]);
+  const columns = [
+    { field: "rankInCategory", headerName: "Locul", width: 100 },
+    { field: "racerName", headerName: "Nume", width: 200 },
+    { field: "category", headerName: "Categorie", width: 150 },
+    { field: "points", headerName: "Total Puncte", width: 130 },
+  ];
 
   return (
-    <div>
-      <h2>Championship Results</h2>
-      <ul>
-        {championshipResults.map((result, index) => (
-          <li
-            key={index}
-          >{`Racer ${result.racerId}: ${result.points} points`}</li>
-        ))}
-      </ul>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 600,
+        width: "95%",
+        margin: "auto",
+        marginTop: "20px",
+      }}
+    >
+      <DataGrid
+        rows={displayResults}
+        columns={columns}
+        getRowId={(row: any) => row.racerId}
+      />
     </div>
   );
 };

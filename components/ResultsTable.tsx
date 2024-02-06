@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { DataGrid, GridCellParams } from "@mui/x-data-grid";
 import { Icon } from "@mui/material";
 import axios from "axios";
-import { calculatePoints } from "@/app/utils/utils";
+import {
+  calculatePoints,
+  getTotalTime,
+  timeStringToMilliseconds,
+} from "@/app/utils/utils";
+import { baseUrl } from "@/app/utils/constants";
 
 const mapRunStatus = (status: number) => {
   switch (status) {
@@ -116,40 +121,9 @@ const runTimeComparator = (v1, v2, cellParams1, cellParams2) => {
   return 0;
 };
 
-const timeStringToMilliseconds = (timeString) => {
-  if (!timeString || timeString === "N/A") return Infinity; // To handle non-finishers
-  const [minutes, rest] = timeString.split(":");
-  const [seconds, millis = "0"] = rest.split(".");
-  return (
-    parseInt(minutes) * 60000 + parseInt(seconds) * 1000 + parseInt(millis)
-  );
-};
-
-const getTotalTime = (time1, time2) => {
-  // Convert time strings to milliseconds
-  const toMilliseconds = (time) => {
-    if (!time || time.trim() === "") return 0;
-    const [minutes, seconds] = time.split(":").map(Number);
-    const [secs, millis = 0] = seconds.toString().split(".");
-    const sec = Number(secs);
-    const milli = Number(millis.padEnd(3, "0"));
-    return (minutes * 60 + sec) * 1000 + milli;
-  };
-  // Add the times in milliseconds
-  const totalMilliseconds = toMilliseconds(time1) + toMilliseconds(time2);
-  // Convert total milliseconds back to the time format
-  const totalSeconds = Math.floor(totalMilliseconds / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const milliseconds = totalMilliseconds % 1000;
-  const seconds = totalSeconds % 60;
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
-};
-
-const processRows = (runs) => {
+const processRows = (runs, selectedAgeGroup, searchFilter) => {
   const racerData = {};
-
+  console.log(runs.filter((run) => run.racer === undefined));
   runs.forEach((run, index) => {
     if (!racerData[run.racerId]) {
       racerData[run.racerId] = {
@@ -228,10 +202,19 @@ const processRows = (runs) => {
       racer.accumulatedPoints = calculatePoints(index + 1);
     });
   });
-  return Object.values(racerData);
+
+  return Object.values(racerData)
+    .filter((r: any) =>
+      selectedAgeGroup !== "" && selectedAgeGroup !== "Toate"
+        ? r.category === selectedAgeGroup
+        : true
+    )
+    .filter((r: any) =>
+      r.racerName.toLowerCase().includes(searchFilter.toLowerCase())
+    );
 };
 
-const ResultsTable = (props) => {
+const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
   const [selectedRacer, setSelectedRacer] = useState<any>(null);
   const [sortModel, setSortModel] = useState<any>([
     { field: "totalTime", sort: "asc" },
@@ -247,19 +230,18 @@ const ResultsTable = (props) => {
     }
   };
 
-  const baseUrl = "https://api.campionatul5c.ro";
   useEffect(() => {
     const handleKeyPress = async (event) => {
       if (selectedRacer) {
         if (event.key === "v") {
           await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${props.raceId}`
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${raceId}`
           );
           console.log("Pressed 'v' for racer:", selectedRacer);
         } else if (event.key === "i") {
           // Call the function for 'i'
           await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${props.raceId}`
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerNumber}/${raceId}`
           );
         }
       }
@@ -333,7 +315,7 @@ const ResultsTable = (props) => {
     },
   ];
 
-  const rows: any = processRows(props.runs);
+  const rows: any = processRows(runs, selectedAgeGroup, searchFilter);
 
   return (
     <div
@@ -342,6 +324,7 @@ const ResultsTable = (props) => {
         width: "100%",
         background: "rgba(255, 255, 255)",
         borderRadius: "20px",
+        marginTop: "3px",
       }}
     >
       <DataGrid
