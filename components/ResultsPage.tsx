@@ -303,16 +303,7 @@ const ResultsPage: React.FC = () => {
           >
             <RefreshIcon />
           </IconButton>
-          Designed by{" "}
-          <a
-            href="https://www.linkedin.com/in/andrei-stetcu-44340588/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "inherit" }} // Inherit the color from parent
-          >
-            Andrei Ștețcu
-          </a>
-          . Developed by{" "}
+          Developed by{" "}
           <a
             href="https://www.linkedin.com/in/andrei-tudorica-661a22b9/"
             target="_blank"
@@ -328,8 +319,18 @@ const ResultsPage: React.FC = () => {
             rel="noopener noreferrer"
             style={{ color: "inherit" }}
           >
-            Radu Matei Bîrle
+            Radu Matei Bîrle.
           </a>
+          Designed by{" "}
+          <a
+            href="https://www.linkedin.com/in/andrei-stetcu-44340588/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "inherit" }} // Inherit the color from parent
+          >
+            Andrei Ștețcu
+          </a>
+          .
         </Box>
       </Paper>
     </Box>
