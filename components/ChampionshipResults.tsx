@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { baseUrl } from "@/app/utils/constants";
+import { Helmet } from "react-helmet";
 
 const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
   const [displayResults, setDisplayResults] = useState<readonly any[]>([]);
@@ -58,6 +59,9 @@ const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
         marginTop: "20px",
       }}
     >
+      <Helmet>
+        <title>5C- Rezultate Campionat</title>
+      </Helmet>
       <DataGrid
         rows={displayResults}
         columns={columns}

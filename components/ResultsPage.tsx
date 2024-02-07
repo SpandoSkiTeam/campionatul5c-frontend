@@ -14,7 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
-
+import { Helmet } from "react-helmet";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
 import ChampionshipResults from "./ChampionshipResults";
@@ -258,6 +258,9 @@ const ResultsPage: React.FC = () => {
                       color: "#7eb7e3",
                     }}
                   >
+                    <Helmet>
+                      <title>5C- Rezultate Curse</title>
+                    </Helmet>
                     <WarningIcon
                       sx={{
                         fontSize: { xs: "1.2rem", sm: "1.3rem", md: "1.3rem" },
