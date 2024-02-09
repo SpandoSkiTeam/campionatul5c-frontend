@@ -134,9 +134,10 @@ const ResultsPage: React.FC = () => {
         // Map through each race's runs and update them if they match the updated ones
         const updatedRaceRuns = race.runs.map((run) => {
           const updateForRun = updatedRuns.find(
-            (update) => update.id === run.id
+            (update) => update.id === run.id && update.status !== run.status
           );
           if (updateForRun) {
+            console.log(updateForRun);
             switch (updateForRun.status) {
               case 0:
                 validationSnackbarMessage = `Participantul ${
@@ -164,7 +165,7 @@ const ResultsPage: React.FC = () => {
                     updateForRun.runNumber
                   } cu timpul ${updateForRun.runTime.substring(
                     3,
-                    run.runTime.length - 4
+                    updateForRun.runTime.length - 4
                   )}`
                 );
                 break;
