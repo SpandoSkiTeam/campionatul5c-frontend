@@ -3,7 +3,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { baseUrl } from "@/app/utils/constants";
 import { Helmet } from "react-helmet";
-import Messages from "./messages";
 
 const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
   const [displayResults, setDisplayResults] = useState<readonly any[]>([]);
