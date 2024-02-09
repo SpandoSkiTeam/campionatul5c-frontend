@@ -90,3 +90,26 @@ export const getTotalTime = (time1, time2) => {
     .toString()
     .padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
 };
+
+export const mapRunStatus = (status: number) => {
+  switch (status) {
+    case 0:
+      return { text: "Înscris", color: "gray", iconName: "assignment" };
+    case 1:
+      return {
+        text: "În coborâre",
+        color: "orange",
+        iconName: "trending_down",
+      };
+    case 2:
+      return { text: "Finalizat", color: "green", iconName: "check_circle" };
+    case 3:
+      return { text: "Descalificat", color: "red", iconName: "cancel" };
+    case 4:
+      return { text: "Validat", color: "blue", iconName: "verified" };
+    case 5:
+      return { text: "Neîncheiat", color: "purple", iconName: "pause" };
+    default:
+      return { text: "Status Necunoscut", color: "black", iconName: "help" };
+  }
+};

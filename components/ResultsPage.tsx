@@ -1,6 +1,6 @@
 "use client";
 // components/Form.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ResultsTable from "./ResultsTable";
 import {
   Box,
@@ -19,6 +19,18 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
 import ChampionshipResults from "./ChampionshipResults";
 import { ageGroups, baseUrl } from "@/app/utils/constants";
+import {
+  HttpTransportType,
+  HubConnectionBuilder,
+  LogLevel,
+} from "@microsoft/signalr";
+import {
+  enqueueErrorSnackbar,
+  enqueueInfoSnackbar,
+  enqueueSuccessSnackbar,
+  enqueueWarningSnackbar,
+} from "./Snackbar";
+import { mapRunStatus } from "@/app/utils/utils";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -69,12 +81,131 @@ const ResultsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [searchFilter, setSearchFilter] = useState("");
-  const [races, setRaces] = useState([]);
+  const [races, setRaces] = useState<any>([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
   const currentRace = 2;
   const [selectedRace, setSetSelectedRace] = useState(currentRace);
   const [displayChampionshipResults, setDisplayChampionshipResults] =
     useState(false);
+  const [isReceivingLiveMessages, setIsReceivingLiveMessages] =
+    useState<boolean>(false);
+  const racesRef = useRef(races);
+
+  useEffect(() => {
+    racesRef.current = races;
+  }, [races]);
+
+  useEffect(() => {
+    const connection = new HubConnectionBuilder()
+      .withUrl(`${baseUrl}/notificationhub`, {
+        skipNegotiation: true,
+        transport: HttpTransportType.WebSockets,
+      })
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
+
+      .build();
+
+    connection
+      .start()
+      .then(function () {
+        console.log("SignalR connected!");
+        setIsReceivingLiveMessages(true);
+        enqueueSuccessSnackbar(
+          "Conectat",
+          "Rezultatele live sunt acum disponibile. modificarile vor apărea automat în pagină."
+        );
+      })
+      .catch(function (err) {
+        setIsReceivingLiveMessages(false);
+        enqueueErrorSnackbar(
+          "Eroare de conectare",
+          "Sistemul de rezultate live nu este disponibil. Folosiți butonul de refresh din parte dreaptă jos a paginii."
+        );
+        return console.error(err.toString());
+      });
+
+    const handleRaceRunUpdate = (message) => {
+      const updatedRuns = JSON.parse(message);
+      console.log("updatedRuns", updatedRuns);
+      console.log("races", racesRef.current);
+      let validationSnackbarMessage = "";
+      const newRaces = racesRef.current.map((race) => {
+        // Map through each race's runs and update them if they match the updated ones
+        const updatedRaceRuns = race.runs.map((run) => {
+          const updateForRun = updatedRuns.find(
+            (update) => update.id === run.id
+          );
+          if (updateForRun) {
+            switch (updateForRun.status) {
+              case 0:
+                validationSnackbarMessage = `Participantul ${
+                  run.racer.lastName
+                } ${run.racer.firstName} este acum ${
+                  mapRunStatus(updateForRun.status).text
+                }`;
+                break;
+              case 1:
+                enqueueWarningSnackbar(
+                  "Modificare de cursă",
+                  `Participantul ${run.racer.lastName} ${
+                    run.racer.firstName
+                  } este acum ${mapRunStatus(updateForRun.status).text}`
+                );
+                break;
+              case 2:
+                enqueueSuccessSnackbar(
+                  "Modificare de cursă",
+                  `Participantul ${run.racer.lastName} ${
+                    run.racer.firstName
+                  } este acum ${
+                    mapRunStatus(updateForRun.status).text
+                  } în manșa ${
+                    updateForRun.runNumber
+                  } cu timpul ${updateForRun.runTime.substring(
+                    3,
+                    run.runTime.length - 4
+                  )}`
+                );
+                break;
+              case 3:
+                enqueueErrorSnackbar(
+                  "Modificare de cursă",
+                  `Participantul ${run.racer.lastName} ${
+                    run.racer.firstName
+                  } este acum ${mapRunStatus(updateForRun.status).text}`
+                );
+                break;
+              case 4:
+                validationSnackbarMessage = `Participantul ${
+                  run.racer.lastName
+                } ${run.racer.firstName}  este acum ${
+                  mapRunStatus(updateForRun.status).text
+                }`;
+                break;
+            }
+          }
+          return updateForRun ? { ...run, ...updateForRun } : run;
+        });
+        // Return the race with its updated runs
+        return { ...race, runs: updatedRaceRuns };
+      });
+      setRaces(newRaces);
+      if (validationSnackbarMessage !== "")
+        enqueueInfoSnackbar(
+          "Modificare de validare",
+          validationSnackbarMessage
+        );
+      console.log("newRaces", newRaces);
+    };
+
+    connection.on("updated_race_runs", handleRaceRunUpdate);
+
+    return () => {
+      connection.off("updated_race_runs", handleRaceRunUpdate);
+    };
+  }, []);
+
   const handleAgeGroupChange = (event) => {
     setSelectedAgeGroup(event.target.value);
   };
@@ -100,10 +231,13 @@ const ResultsPage: React.FC = () => {
     setIsFetchingData(true);
     try {
       const response = await axios.get(baseUrl + "/Race");
-      console.log(response.data);
       setRaces(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      enqueueErrorSnackbar(
+        "Eroare de sistem",
+        "A apărut o eroare la încărcarea datelor. Reîncărcați pagina"
+      );
       // Handle the error as needed
     } finally {
       setIsFetchingData(false);
@@ -133,33 +267,35 @@ const ResultsPage: React.FC = () => {
 
   return (
     <Box sx={{ width: "100%", color: "white" }}>
-      <Box
-        sx={{
-          position: "fixed",
-          bottom: 14,
-          right: 14,
-          zIndex: 1000,
-          background: "white",
-          borderColor: "#14204f",
-          borderWidth: "1px",
-          borderRadius: "8px",
-          borderStyle: "solid",
-        }}
-      >
-        <IconButton
-          onClick={fetchData}
+      {!isReceivingLiveMessages && (
+        <Box
           sx={{
-            animation: isFetchingData ? "spin 1s linear infinite" : "none",
+            position: "fixed",
+            bottom: 14,
+            right: 14,
+            zIndex: 1000,
+            background: "white",
+            borderColor: "#14204f",
+            borderWidth: "1px",
+            borderRadius: "8px",
+            borderStyle: "solid",
           }}
         >
-          <RefreshIcon
-            style={{
-              borderColor: "#14204f",
-              color: "#14204f",
+          <IconButton
+            onClick={fetchData}
+            sx={{
+              animation: isFetchingData ? "spin 1s linear infinite" : "none",
             }}
-          />
-        </IconButton>
-      </Box>
+          >
+            <RefreshIcon
+              style={{
+                borderColor: "#14204f",
+                color: "#14204f",
+              }}
+            />
+          </IconButton>
+        </Box>
+      )}
 
       <Paper
         sx={{

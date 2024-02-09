@@ -1,6 +1,7 @@
 import type { AppProps } from "next/app";
 import "../app/globals.css";
 import Head from "next/head";
+import { SnackbarProvider } from "@/components/Snackbar";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -20,6 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         />
       </Head>
+      <SnackbarProvider />
       <Component {...pageProps} />
     </>
   );
