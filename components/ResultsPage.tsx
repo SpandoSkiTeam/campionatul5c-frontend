@@ -127,17 +127,16 @@ const ResultsPage: React.FC = () => {
 
     const handleRaceRunUpdate = (message) => {
       const updatedRuns = JSON.parse(message);
-      console.log("updatedRuns", updatedRuns);
-      console.log("races", racesRef.current);
       let validationSnackbarMessage = "";
       const newRaces = racesRef.current.map((race) => {
         // Map through each race's runs and update them if they match the updated ones
         const updatedRaceRuns = race.runs.map((run) => {
           const updateForRun = updatedRuns.find(
-            (update) => update.id === run.id && update.status !== run.status
+            (update) =>
+              update.id === run.id &&
+              (update.status !== run.status || update.runTime !== run.runTime)
           );
           if (updateForRun) {
-            console.log(updateForRun);
             switch (updateForRun.status) {
               case 0:
                 validationSnackbarMessage = `Participantul ${
@@ -197,7 +196,6 @@ const ResultsPage: React.FC = () => {
           "Modificare de validare",
           validationSnackbarMessage
         );
-      console.log("newRaces", newRaces);
     };
 
     connection.on("updated_race_runs", handleRaceRunUpdate);

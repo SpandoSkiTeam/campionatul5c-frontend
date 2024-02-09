@@ -183,7 +183,7 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
   return Object.values(racerData)
     .filter((r: any) =>
       selectedAgeGroup !== "" && selectedAgeGroup !== "Toate"
-        ? r.category === selectedAgeGroup
+        ? selectedAgeGroup.includes(r.category)
         : true
     )
     .filter((r: any) =>
@@ -211,11 +211,9 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
     const handleKeyPress = async (event) => {
       if (selectedRacer) {
         if (event.key === "v") {
-          console.log(selectedRacer);
           await axios.get(
             `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`
           );
-          console.log("Pressed 'v' for racer:", selectedRacer);
         } else if (event.key === "i") {
           // Call the function for 'i'
           await axios.get(
