@@ -21,7 +21,7 @@ const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
             (racer: any) =>
               selectedAgeGroup === "" ||
               selectedAgeGroup === "Toate" ||
-              racer.category === selectedAgeGroup
+              selectedAgeGroup.includes(racer.category)
           )
           .filter(
             (racer: any) =>
