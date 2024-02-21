@@ -188,7 +188,19 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
     )
     .filter((r: any) =>
       r.racerName.toLowerCase().includes(searchFilter.toLowerCase())
-    );
+    )
+    .sort((a, b) => {
+      // Check if totalTime is "N/A", convert to a high value for sorting
+      let timeA =
+        a.totalTime === "N/A" ? Number.MAX_VALUE : parseFloat(a.totalTime);
+      let timeB =
+        b.totalTime === "N/A" ? Number.MAX_VALUE : parseFloat(b.totalTime);
+
+      if (timeA !== timeB) return timeA - timeB; // Sort by totalTime if not equal
+
+      // If totalTime is equal or "N/A", sort by racerNumber
+      return a.racerNumber - b.racerNumber;
+    });
 };
 
 const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
