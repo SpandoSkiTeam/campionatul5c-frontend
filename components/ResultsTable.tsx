@@ -189,7 +189,7 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
     .filter((r: any) =>
       r.racerName.toLowerCase().includes(searchFilter.toLowerCase())
     )
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       // Check if totalTime is "N/A", convert to a high value for sorting
       let timeA =
         a.totalTime === "N/A" ? Number.MAX_VALUE : parseFloat(a.totalTime);
