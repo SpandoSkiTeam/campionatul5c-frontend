@@ -31,6 +31,7 @@ import {
   enqueueWarningSnackbar,
 } from "./Snackbar";
 import { mapRunStatus } from "@/app/utils/utils";
+import { races2024 } from "@/app/utils/races2024";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -83,7 +84,7 @@ const ResultsPage: React.FC = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState<any>([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
-  const currentRace = 4;
+  const currentRace = 1;
   const [selectedRace, setSetSelectedRace] = useState(currentRace);
   const [displayChampionshipResults, setDisplayChampionshipResults] =
     useState(false);
@@ -226,21 +227,8 @@ const ResultsPage: React.FC = () => {
     setIsLoading(false);
   };
 
-  const fetchData = async () => {
-    setIsFetchingData(true);
-    try {
-      const response = await axios.get(baseUrl + "/Race");
-      setRaces(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      enqueueErrorSnackbar(
-        "Eroare de sistem",
-        "A apărut o eroare la încărcarea datelor. Reîncărcați pagina"
-      );
-      // Handle the error as needed
-    } finally {
-      setIsFetchingData(false);
-    }
+  const fetchData = () => {
+    setRaces(races2024);
   };
 
   useEffect(() => {

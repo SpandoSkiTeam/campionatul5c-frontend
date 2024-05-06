@@ -3,19 +3,22 @@ import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { baseUrl } from "@/app/utils/constants";
 import { Helmet } from "react-helmet";
+import { championshipResults2024 } from "@/app/utils/championshipResults2024";
 
 const ChampionshipResults = ({ selectedAgeGroup, searchFilter }) => {
   const [displayResults, setDisplayResults] = useState<readonly any[]>([]);
 
   useEffect(() => {
-    const fetchResults = async () => {
+    const fetchResults = () => {
       try {
-        const response = await axios.get(
-          `${baseUrl}/Race/GetChampionshipResults`
-        );
-        const results = response.data;
+        // const response = await axios.get(
+        //   `${baseUrl}/Race/GetChampionshipResults`
+        // );
+        // const results = response.data;
 
-        const filteredResults = results
+        // const filteredResults = results;
+
+        const filteredResults = championshipResults2024
           .filter((racer: any) => racer.points > 0)
           .filter(
             (racer: any) =>
