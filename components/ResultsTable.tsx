@@ -289,12 +289,13 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
       renderCell: renderTotalTimeCell,
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
-    {
-      field: "accumulatedPoints",
-      headerName: "Puncte",
-      width: 150,
-      valueGetter: (params) => params.row.accumulatedPoints || 0,
-    },
+    // TO BE ACTIVATED WHEN USED IN THE CONTEXT OF A CHAMPIONSHIP
+    // {
+    //   field: "accumulatedPoints",
+    //   headerName: "Puncte",
+    //   width: 150,
+    //   valueGetter: (params) => params.row.accumulatedPoints || 0,
+    // },
     {
       field: "racerParentalAgreement",
       headerName: "AP",
