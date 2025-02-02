@@ -93,6 +93,7 @@ const runTimeComparator = (v1, v2, cellParams1, cellParams2) => {
     return timeStringToMilliseconds(time1) - timeStringToMilliseconds(time2);
   }
 
+  // Handle cases where one or both times are missing
   if (!time1) return 1; // Sort nulls to the end
   if (!time2) return -1; // Sort nulls to the end
   return 0;
