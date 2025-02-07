@@ -79,7 +79,11 @@ const renderParentalAgreementCell = (params: GridCellParams) => {
         alignItems: "center",
       }}
     >
-      {row.racerParentalAgreement && <Icon>{"check_circle"}</Icon>}
+      {row.racerParentalAgreement && (
+        <a href={row.racerParentalAgreement} target="_blank">
+          <Icon>check_circle</Icon>
+        </a>
+      )}
     </div>
   );
 };
@@ -107,8 +111,9 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
         id: index,
         racerId: run.racerId,
         racerNumber: run.racerNumber,
+        birthYear: run.racer.birthYear,
         racerName: run.racer.lastName.trim() + " " + run.racer.firstName.trim(),
-        racerParentalAgreement: run.racer.parentalAgreementSigned,
+        racerParentalAgreement: run.racer.ParentalAgreementURL,
         category: run.racer.category,
         statusRun1: run.runNumber === 1 ? mapRunStatus(run.status) : "N/A",
         statusRun2: run.runNumber === 2 ? mapRunStatus(run.status) : "N/A",
@@ -289,6 +294,12 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
       renderCell: renderTotalTimeCell,
     },
     { field: "category", headerName: "Categorie", width: 150, minWidth: 120 },
+    {
+      field: "birthYear",
+      headerName: "Anul nasteri",
+      width: 150,
+      minWidth: 120,
+    },
     // TO BE ACTIVATED WHEN USED IN THE CONTEXT OF A CHAMPIONSHIP
     // {
     //   field: "accumulatedPoints",
