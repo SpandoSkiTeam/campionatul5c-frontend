@@ -32,6 +32,7 @@ import {
 } from "./Snackbar";
 import { mapRunStatus } from "@/app/utils/utils";
 import { races2024 } from "@/app/utils/races2024";
+import { races2025 } from "@/app/utils/races2025";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -227,25 +228,25 @@ const ResultsPage: React.FC = () => {
     setIsLoading(false);
   };
 
-  const fetchData = async () => {
-    setIsFetchingData(true);
-    try {
-      const response = await axios.get(baseUrl + "/Race");
-      setRaces(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      enqueueErrorSnackbar(
-        "Eroare de sistem",
-        "A apărut o eroare la încărcarea datelor. Reîncărcați pagina"
-      );
-      // Handle the error as needed
-    } finally {
-      setIsFetchingData(false);
-    }
-  };
-  // const fetchData = () => {
-  //   setRaces(races2024);
+  // const fetchData = async () => {
+  //   setIsFetchingData(true);
+  //   try {
+  //     const response = await axios.get(baseUrl + "/Race");
+  //     setRaces(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //     enqueueErrorSnackbar(
+  //       "Eroare de sistem",
+  //       "A apărut o eroare la încărcarea datelor. Reîncărcați pagina"
+  //     );
+  //     // Handle the error as needed
+  //   } finally {
+  //     setIsFetchingData(false);
+  //   }
   // };
+  const fetchData = () => {
+    setRaces(races2025);
+  };
 
   useEffect(() => {
     fetchData(); // Initial fetch
