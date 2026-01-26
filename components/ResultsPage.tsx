@@ -244,6 +244,7 @@ const ResultsPage: React.FC = () => {
   //     setIsFetchingData(false);
   //   }
   // };
+
   const fetchData = () => {
     setRaces(races2025);
   };
