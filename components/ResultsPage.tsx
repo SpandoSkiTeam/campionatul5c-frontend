@@ -115,14 +115,14 @@ const ResultsPage: React.FC = () => {
         setIsReceivingLiveMessages(true);
         enqueueSuccessSnackbar(
           "Conectat",
-          "Rezultatele live sunt acum disponibile. modificarile vor apărea automat în pagină."
+          "Rezultatele live sunt acum disponibile. modificarile vor apărea automat în pagină.",
         );
       })
       .catch(function (err) {
         setIsReceivingLiveMessages(false);
         enqueueErrorSnackbar(
           "Eroare de conectare",
-          "Sistemul de rezultate live nu este disponibil. Folosiți butonul de refresh din parte dreaptă jos a paginii."
+          "Sistemul de rezultate live nu este disponibil. Folosiți butonul de refresh din parte dreaptă jos a paginii.",
         );
         return console.error(err.toString());
       });
@@ -136,7 +136,7 @@ const ResultsPage: React.FC = () => {
           const updateForRun = updatedRuns.find(
             (update) =>
               update.id === run.id &&
-              (update.status !== run.status || update.runTime !== run.runTime)
+              (update.status !== run.status || update.runTime !== run.runTime),
           );
           if (updateForRun) {
             switch (updateForRun.status) {
@@ -152,7 +152,7 @@ const ResultsPage: React.FC = () => {
                   "Modificare de cursă",
                   `Participantul ${run.racer.lastName} ${
                     run.racer.firstName
-                  } este acum ${mapRunStatus(updateForRun.status).text}`
+                  } este acum ${mapRunStatus(updateForRun.status).text}`,
                 );
                 break;
               case 2:
@@ -166,8 +166,8 @@ const ResultsPage: React.FC = () => {
                     updateForRun.runNumber
                   } cu timpul ${updateForRun.runTime.substring(
                     3,
-                    updateForRun.runTime.length - 4
-                  )}`
+                    updateForRun.runTime.length - 4,
+                  )}`,
                 );
                 break;
               case 3:
@@ -175,7 +175,7 @@ const ResultsPage: React.FC = () => {
                   "Modificare de cursă",
                   `Participantul ${run.racer.lastName} ${
                     run.racer.firstName
-                  } este acum ${mapRunStatus(updateForRun.status).text}`
+                  } este acum ${mapRunStatus(updateForRun.status).text}`,
                 );
                 break;
               case 4:
@@ -196,7 +196,7 @@ const ResultsPage: React.FC = () => {
       if (validationSnackbarMessage !== "")
         enqueueInfoSnackbar(
           "Modificare de validare",
-          validationSnackbarMessage
+          validationSnackbarMessage,
         );
     };
 
@@ -228,26 +228,26 @@ const ResultsPage: React.FC = () => {
     setIsLoading(false);
   };
 
-  // const fetchData = async () => {
-  //   setIsFetchingData(true);
-  //   try {
-  //     const response = await axios.get(baseUrl + "/Race");
-  //     setRaces(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     enqueueErrorSnackbar(
-  //       "Eroare de sistem",
-  //       "A apărut o eroare la încărcarea datelor. Reîncărcați pagina"
-  //     );
-  //     // Handle the error as needed
-  //   } finally {
-  //     setIsFetchingData(false);
-  //   }
-  // };
-
-  const fetchData = () => {
-    setRaces(races2025);
+  const fetchData = async () => {
+    setIsFetchingData(true);
+    try {
+      const response = await axios.get(baseUrl + "/Race");
+      setRaces(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      enqueueErrorSnackbar(
+        "Eroare de sistem",
+        "A apărut o eroare la încărcarea datelor. Reîncărcați pagina",
+      );
+      // Handle the error as needed
+    } finally {
+      setIsFetchingData(false);
+    }
   };
+
+  // const fetchData = () => {
+  //   setRaces(races2025);
+  // };
 
   useEffect(() => {
     fetchData(); // Initial fetch
