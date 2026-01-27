@@ -1,5 +1,4 @@
-export const baseUrl =
-  "http://campionatul5c-alb-762621925.eu-central-1.elb.amazonaws.com";
+export const baseUrl = "https://api-campionatul5c.brightr.ro";
 
 export const ageGroups = [
   "Toate",
