@@ -146,7 +146,7 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
         if (racerData)
           racerData[run.racerId].totalTime = getTotalTime(
             racerData[run.racerId].runTimeRun1,
-            racerData[run.racerId].runTimeRun2
+            racerData[run.racerId].runTimeRun2,
           );
       } else {
         racerData[run.racerId].totalTime = "N/A";
@@ -167,7 +167,7 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
         acc[category].push(racer);
       return acc;
     },
-    {}
+    {},
   );
 
   Object.keys(categories).forEach((category) => {
@@ -189,10 +189,10 @@ const processRows = (runs, selectedAgeGroup, searchFilter) => {
     .filter((r: any) =>
       selectedAgeGroup !== "" && selectedAgeGroup !== "Toate"
         ? selectedAgeGroup.includes(r.category)
-        : true
+        : true,
     )
     .filter((r: any) =>
-      r.racerName.toLowerCase().includes(searchFilter.toLowerCase())
+      r.racerName.toLowerCase().includes(searchFilter.toLowerCase()),
     )
     .sort((a: any, b: any) => {
       // Check if totalTime is "N/A", convert to a high value for sorting
@@ -227,14 +227,20 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
   useEffect(() => {
     const handleKeyPress = async (event) => {
       if (selectedRacer) {
-        if (event.key === "v") {
+        if (
+          selectedRacer.row.statusRun1.text !== "Validat" &&
+          event.key === "v"
+        ) {
           await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`,
           );
-        } else if (event.key === "i") {
+        } else if (
+          selectedRacer.row.statusRun1.text === "Validat" &&
+          event.key === "i"
+        ) {
           // Call the function for 'i'
           await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`
+            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`,
           );
         }
       }
