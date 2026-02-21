@@ -225,35 +225,48 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
   };
 
   useEffect(() => {
-    const handleKeyPress = async (event) => {
-      console.log(selectedRacer.row.statusRun1.text);
-      console.log(event.key);
-      if (selectedRacer) {
-        if (
-          selectedRacer.row.statusRun1.text !== "Validat" &&
-          event.key === "v"
-        ) {
-          await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`,
-          );
-        } else if (
-          selectedRacer.row.statusRun1.text === "Validat" &&
-          event.key === "i"
-        ) {
-          // Call the function for 'i'
-          await axios.get(
-            `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`,
-          );
-        }
+    const handleKeyPress = async (event: KeyboardEvent) => {
+      if (!selectedRacer) return;
+
+      const isValid = selectedRacer.statusRun1?.text === "Validat";
+      const shouldToggle =
+        (!isValid && event.key.toLowerCase() === "v") ||
+        (isValid && event.key.toLowerCase() === "i");
+
+      if (!shouldToggle) return;
+
+      try {
+        // 1) Call API (server is source of truth)
+        await axios.get(
+          `${baseUrl}/Racer/ToggleRacerValidation/${selectedRacer.racerId}/${raceId}`,
+        );
+
+        // 2) Update local state so UI updates immediately
+        setSelectedRacer((prev: any) => {
+          if (!prev) return prev;
+
+          const prevIsValid = prev.statusRun1?.text === "Validat";
+          return {
+            ...prev,
+            statusRun1: {
+              ...(prev.statusRun1 ?? {}),
+              text: prevIsValid ? "Invalid" : "Validat",
+            },
+          };
+        });
+      } catch (err) {
+        console.error("Toggle validation failed:", err);
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [selectedRacer]);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [
+    selectedRacer?.racerId,
+    selectedRacer?.statusRun1?.text,
+    baseUrl,
+    raceId,
+  ]);
 
   const handleRowSelection = (selectionModel) => {
     if (selectionModel.length > 0) {
@@ -315,12 +328,12 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
     //   width: 150,
     //   valueGetter: (params) => params.row.accumulatedPoints || 0,
     // },
-    {
-      field: "racerParentalAgreement",
-      headerName: "AP",
-      width: 60,
-      renderCell: renderParentalAgreementCell,
-    },
+    // {
+    //   field: "racerParentalAgreement",
+    //   headerName: "AP",
+    //   width: 60,
+    //   renderCell: renderParentalAgreementCell,
+    // },
   ];
 
   const rows: any = processRows(runs, selectedAgeGroup, searchFilter);
