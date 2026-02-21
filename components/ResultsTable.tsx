@@ -226,6 +226,8 @@ const ResultsTable = ({ runs, raceId, selectedAgeGroup, searchFilter }) => {
 
   useEffect(() => {
     const handleKeyPress = async (event) => {
+      console.log(selectedRacer.row.statusRun1.text);
+      console.log(event.key);
       if (selectedRacer) {
         if (
           selectedRacer.row.statusRun1.text !== "Validat" &&
