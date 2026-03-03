@@ -85,7 +85,7 @@ const ResultsPage: React.FC = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [races, setRaces] = useState<any>([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
-  const currentRace = 1;
+  const currentRace = 2;
   const [selectedRace, setSetSelectedRace] = useState(currentRace);
   const [displayChampionshipResults, setDisplayChampionshipResults] =
     useState(false);
